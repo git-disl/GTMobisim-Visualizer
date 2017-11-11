@@ -1,0 +1,1 @@
+java -Xmx3G -cp "../thirdparty/*:../gtmobisim.jar" edu.gatech.lbs.sim.Simulation $1

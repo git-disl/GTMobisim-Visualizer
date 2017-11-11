@@ -1,0 +1,1 @@
+java -Xmx500M -cp "../thirdparty/*;../gtmobisim.jar" edu.gatech.lbs.sim.examples.ExampleAgentsOnSegment web-demo.xml "150 sec" 4618
