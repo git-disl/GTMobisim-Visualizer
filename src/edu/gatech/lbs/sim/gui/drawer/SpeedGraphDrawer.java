@@ -108,6 +108,7 @@ public class SpeedGraphDrawer implements IDrawer {
         g2.drawString("80%", (float)(X0 - 30), (float)(GRAPH_Y0 - (GRAPH_HEIGHT)*0.8));
         g2.drawString("90%", (float)(X0 - 30), (float)(GRAPH_Y0 - (GRAPH_HEIGHT)*0.9));
 
+
         g2.draw(new Line2D.Double((float)(X0 + X_TICK * 120), (float)GRAPH_Y0, (float)(X0 + X_TICK * 120), (float)(GRAPH_Y0 - 5)));
         g2.draw(new Line2D.Double((float)(X0 + X_TICK * 120 * 2), (float)GRAPH_Y0, (float)(X0 + X_TICK * 120 * 2), (float)(GRAPH_Y0 - 5)));
         g2.draw(new Line2D.Double((float)(X0 + X_TICK * 120 * 3), (float)GRAPH_Y0, (float)(X0 + X_TICK * 120 * 3), (float)(GRAPH_Y0 - 5)));
@@ -133,6 +134,8 @@ public class SpeedGraphDrawer implements IDrawer {
             Map.Entry<Integer, HashSet<SimAgent>> pair = (Map.Entry)it.next();
             double proportion = ((double)pair.getValue().size() / (double)totalAgentCount);
             g2.setColor(getColorPerMPH(pair.getKey()));
+//            g2.draw(new Line2D.Double(X0 + iteration * X_TICK, GRAPH_Y0 - (GRAPH_HEIGHT * speedToPercentageMap.get(pair.getKey())),
+//                    X0 + iteration * X_TICK + X_TICK, GRAPH_Y0 - (GRAPH_HEIGHT * proportion)));
 
             Double[] xHistoryPair = new Double[2];
             xHistoryPair[0] = X0 + iteration * X_TICK;
@@ -158,6 +161,7 @@ public class SpeedGraphDrawer implements IDrawer {
             speedToPercentageMap.put(pair.getKey(), proportion);
         }
 
+        ++iteration;
     }
 
     private Color getColorPerMPH(int mph) {
