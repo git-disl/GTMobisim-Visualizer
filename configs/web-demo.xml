@@ -9,7 +9,7 @@
   </world>
 
   <agents count="1000">
-    <mobilitymodel type="RandomTripRoadnet" filename="traces/web-demo.m.trace">
+    <mobilitymodel type="RandomTripRoadnet" filename="traces/web-demo.m.trace" overwrite="yes">
       <parking type="gaussian" mean="10 sec" stdev="5 sec"/>
 			
       <locationdistribution type="hotspotroadnet" count="5" coeff="0.9" seed="0"/>

@@ -13,6 +13,7 @@ import edu.gatech.lbs.sim.gui.drawer.AgentsDrawer;
 import edu.gatech.lbs.sim.gui.drawer.IDrawer;
 import edu.gatech.lbs.sim.gui.drawer.RoadMapDrawer;
 import edu.gatech.lbs.sim.gui.drawer.RodDrawer;
+import edu.gatech.lbs.sim.gui.drawer.SpeedGraphDrawer;
 import edu.gatech.lbs.sim.gui.drawer.TimeDrawer;
 import edu.gatech.lbs.sim.scheduling.event.DrawGUIEvent;
 
@@ -29,6 +30,7 @@ public class GuiDrawingActivity implements ISimActivity {
     drawers.add(new AgentsDrawer(sim, panel));
     drawers.add(new TimeDrawer(sim));
     drawers.add(new RodDrawer(panel));
+    drawers.add(new SpeedGraphDrawer(panel));
     return drawers;
   }
 
@@ -38,6 +40,7 @@ public class GuiDrawingActivity implements ISimActivity {
         SimPanel panel = SimPanel.makeGui(sim);
         panel.setDrawers(getDrawers(sim, panel));
         sim.addEvent(new DrawGUIEvent(sim, sim.getSimStartTime(), panel, period));
+        sim.setGui(panel);
       } catch (Exception e) {
         System.out.println("No GUI.");
       }

@@ -7,6 +7,7 @@ package edu.gatech.lbs.sim.config.helper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 
@@ -29,7 +30,7 @@ import edu.gatech.lbs.sim.tracegenerator.paramdistribution.IParamDistribution;
 
 public class XmlMobilityModelInterpreter implements IXmlConfigInterpreter {
 
-  public void initFromXmlElement(Element mobilitymodelNode, Simulation sim) {
+  public void initFromXmlElement(Element mobilitymodelNode, Simulation sim, Map<String, String> configOverride) {
     ITraceGenerator mobilityTraceGenerator = null;
 
     String mobilityTraceFilename = mobilitymodelNode.getAttribute("filename");
@@ -39,18 +40,21 @@ public class XmlMobilityModelInterpreter implements IXmlConfigInterpreter {
     // location distribution:
     Element locationDistributionNode = (Element) mobilitymodelNode.getElementsByTagName("locationdistribution").item(0);
     XmlLocationDistributionInterpreter ldInterpreter = new XmlLocationDistributionInterpreter();
-    ldInterpreter.initFromXmlElement(locationDistributionNode, sim);
+    ldInterpreter.initFromXmlElement(locationDistributionNode, sim, configOverride);
     ILocationDistribution locationDistribution = ldInterpreter.getLocationDistribution();
 
     // speed distribution:
     Element speedDistributionNode = (Element) mobilitymodelNode.getElementsByTagName("speeddistribution").item(0);
     XmlParamDistributionInterpreter pdInterpreter = new XmlParamDistributionInterpreter(new SpeedParser());
-    pdInterpreter.initFromXmlElement(speedDistributionNode, sim);
+    pdInterpreter.initFromXmlElement(speedDistributionNode, sim, configOverride);
     IParamDistribution speedDistribution = pdInterpreter.getParamDistribution();
 
     Collection<SimAgent> agents = sim.getAgents();
 
     if (mobilitymodelType.equalsIgnoreCase(RandomWaypoint_IndividualMobilityModel.xmlName)) {
+
+      System.out.println("XmlMobilityModelInterpreter - agentSize: " + agents.size());
+
       List<IndividualMobilityModel> mobilityModels = new ArrayList<IndividualMobilityModel>(agents.size());
       for (SimAgent agent : agents) {
         mobilityModels.add(new RandomWaypoint_IndividualMobilityModel(sim, agent, locationDistribution, speedDistribution, sim.getSimStartTime()));
@@ -60,7 +64,7 @@ public class XmlMobilityModelInterpreter implements IXmlConfigInterpreter {
     } else if (mobilitymodelType.equalsIgnoreCase(RoadnetRandomWaypoint_IndividualMobilityModel.xmlName)) {
       Element stoppingTimeNode = (Element) mobilitymodelNode.getElementsByTagName("stopping").item(0);
       XmlParamDistributionInterpreter sInterpreter = new XmlParamDistributionInterpreter(new TimeParser());
-      sInterpreter.initFromXmlElement(stoppingTimeNode, sim);
+      sInterpreter.initFromXmlElement(stoppingTimeNode, sim, configOverride);
       IParamDistribution stoppingTimeDistribution = sInterpreter.getParamDistribution();
 
       List<IndividualMobilityModel> mobilityModels = new ArrayList<IndividualMobilityModel>(agents.size());
@@ -72,12 +76,12 @@ public class XmlMobilityModelInterpreter implements IXmlConfigInterpreter {
     } else if (mobilitymodelType.equalsIgnoreCase(RoadnetRandomTrip_IndividualMobilityModel.xmlName)) {
       Element parkingTimeNode = (Element) mobilitymodelNode.getElementsByTagName("parking").item(0);
       XmlParamDistributionInterpreter pInterpreter = new XmlParamDistributionInterpreter(new TimeParser());
-      pInterpreter.initFromXmlElement(parkingTimeNode, sim);
+      pInterpreter.initFromXmlElement(parkingTimeNode, sim, configOverride);
       IParamDistribution parkingTimeDistribution = pInterpreter.getParamDistribution();
 
       Element stoppingTimeNode = (Element) mobilitymodelNode.getElementsByTagName("stopping").item(0);
       XmlParamDistributionInterpreter sInterpreter = new XmlParamDistributionInterpreter(new TimeParser());
-      sInterpreter.initFromXmlElement(stoppingTimeNode, sim);
+      sInterpreter.initFromXmlElement(stoppingTimeNode, sim, configOverride);
       IParamDistribution stoppingTimeDistribution = sInterpreter.getParamDistribution();
 
       List<IndividualMobilityModel> mobilityModels = new ArrayList<IndividualMobilityModel>(agents.size());

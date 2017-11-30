@@ -17,6 +17,8 @@ import edu.gatech.lbs.sim.tracegenerator.mobilitytrace.locationdistribution.ILoc
 import edu.gatech.lbs.sim.tracegenerator.paramdistribution.IParamDistribution;
 import edu.gatech.lbs.sim.tracegenerator.querytrace.GlobalFixedNumberRangeQueryModel;
 
+import java.util.Map;
+
 public class XmlQueryModelInterpreter implements IXmlConfigInterpreter {
   protected String mobilityTraceFilename;
 
@@ -24,7 +26,7 @@ public class XmlQueryModelInterpreter implements IXmlConfigInterpreter {
     this.mobilityTraceFilename = mobilityTraceFilename;
   }
 
-  public void initFromXmlElement(Element querymodelNode, Simulation sim) {
+  public void initFromXmlElement(Element querymodelNode, Simulation sim, Map<String, String> configOverride) {
     ITraceGenerator queryTraceGenerator = null;
 
     if (querymodelNode == null) {
@@ -45,20 +47,20 @@ public class XmlQueryModelInterpreter implements IXmlConfigInterpreter {
       // radius distribution:
       Element rangeDistributionNode = (Element) querymodelNode.getElementsByTagName("radius").item(0);
       XmlParamDistributionInterpreter interpreter = new XmlParamDistributionInterpreter(new DistanceParser());
-      interpreter.initFromXmlElement(rangeDistributionNode, sim);
+      interpreter.initFromXmlElement(rangeDistributionNode, sim, configOverride);
       IParamDistribution rangeDistribution = interpreter.getParamDistribution();
 
       // lifetime:
       Element lifetimeDistributionNode = (Element) querymodelNode.getElementsByTagName("lifetime").item(0);
       XmlParamDistributionInterpreter interpreter2 = new XmlParamDistributionInterpreter(new TimeParser());
-      interpreter2.initFromXmlElement(lifetimeDistributionNode, sim);
+      interpreter2.initFromXmlElement(lifetimeDistributionNode, sim, configOverride);
       IParamDistribution lifetimeDistribution = interpreter2.getParamDistribution();
 
       // location distribution:
       // if there is no locationdistribution defined, the queries will be uniformly distributed across simAgentIds
       Element locationDistributionNode = (Element) querymodelNode.getElementsByTagName("locationdistribution").item(0);
       XmlLocationDistributionInterpreter ldInterpreter = new XmlLocationDistributionInterpreter();
-      ldInterpreter.initFromXmlElement(locationDistributionNode, sim);
+      ldInterpreter.initFromXmlElement(locationDistributionNode, sim, configOverride);
       ILocationDistribution locationDistribution = ldInterpreter.getLocationDistribution();
 
       queryTraceGenerator = new GlobalFixedNumberRangeQueryModel(mobilityTraceFilename, sim, rangeDistribution, lifetimeDistribution, locationDistribution, queryCount);

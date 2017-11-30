@@ -15,6 +15,8 @@ import edu.gatech.lbs.sim.tracegenerator.paramdistribution.GaussianParamDistribu
 import edu.gatech.lbs.sim.tracegenerator.paramdistribution.IParamDistribution;
 import edu.gatech.lbs.sim.tracegenerator.paramdistribution.UniformParamDistribution;
 
+import java.util.Map;
+
 public class XmlParamDistributionInterpreter implements IXmlConfigInterpreter {
   protected IParamParser pparser;
   protected IParamDistribution paramDistribution;
@@ -27,7 +29,7 @@ public class XmlParamDistributionInterpreter implements IXmlConfigInterpreter {
     return paramDistribution;
   }
 
-  public void initFromXmlElement(Element paramDistributionNode, Simulation sim) {
+  public void initFromXmlElement(Element paramDistributionNode, Simulation sim, Map<String, String> configOverride) {
     paramDistribution = null;
 
     if (paramDistributionNode == null) {
@@ -65,7 +67,7 @@ public class XmlParamDistributionInterpreter implements IXmlConfigInterpreter {
       for (int roadclass = 0; roadclass < classCount; roadclass++) {
         Element classNode = (Element) classNodes.item(roadclass);
         XmlParamDistributionInterpreter interpreter = new XmlParamDistributionInterpreter(pparser);
-        interpreter.initFromXmlElement(classNode, sim);
+        interpreter.initFromXmlElement(classNode, sim, configOverride);
         speedDistributions[roadclass] = interpreter.getParamDistribution();
       }
       paramDistribution = new ClassedRoadnetSpeedDistribution(speedDistributions);

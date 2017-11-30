@@ -10,12 +10,14 @@ import edu.gatech.lbs.sim.Simulation;
 import edu.gatech.lbs.sim.scheduling.activity.GuiDrawingActivity;
 import edu.gatech.lbs.sim.scheduling.activity.VarzWritingActivity;
 
+import java.util.Map;
+
 /**
  * Adds schedulers that are always used, regardless of what is in the config.
  */
 public class NullInterpreter implements IXmlConfigInterpreter {
 
-  public void initFromXmlElement(Element node, Simulation sim) {
+  public void initFromXmlElement(Element node, Simulation sim, Map<String, String> configOverride) {
     sim.addActivity(new GuiDrawingActivity(0.5));
     sim.addActivity(new VarzWritingActivity());
   }

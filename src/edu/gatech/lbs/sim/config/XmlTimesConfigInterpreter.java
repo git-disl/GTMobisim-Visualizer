@@ -10,9 +10,11 @@ import edu.gatech.lbs.sim.Simulation;
 import edu.gatech.lbs.sim.config.paramparser.IParamParser;
 import edu.gatech.lbs.sim.config.paramparser.TimeParser;
 
+import java.util.Map;
+
 public class XmlTimesConfigInterpreter implements IXmlConfigInterpreter {
 
-  public void initFromXmlElement(Element rootNode, Simulation sim) {
+  public void initFromXmlElement(Element rootNode, Simulation sim, Map<String, String> configOverride) {
     IParamParser pparser = new TimeParser();
     long simStartTime = pparser.parse(rootNode.getAttribute("starttime"));
     long simEndTime = pparser.parse(rootNode.getAttribute("endtime"));

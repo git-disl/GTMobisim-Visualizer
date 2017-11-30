@@ -4,17 +4,22 @@
 //
 package edu.gatech.lbs.sim;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.*;
+import javax.swing.border.LineBorder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import edu.gatech.lbs.core.logging.MetricsManager;
+import edu.gatech.lbs.sim.gui.SimPanel;
+import edu.gatech.lbs.sim.scheduling.activity.GuiDrawingActivity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -44,6 +49,8 @@ import edu.gatech.lbs.sim.scheduling.event.SimEvent;
 import edu.gatech.lbs.sim.scheduling.event.VelocityChangeEvent;
 
 public class Simulation {
+  public static String AGENT_COUNT_OVERRIDE_KEY = "agentCount";
+
   // event priorities from highest to lowest priority:
   public static int priorityTraceLoadEvent = 10;
   public static int priorityAccelerationChangeEvent = 20;
@@ -69,9 +76,16 @@ public class Simulation {
   protected SimEventQueue eventQueue; // the simulation event queue
   protected Collection<ISimActivity> simActivities;
 
+  private Map<String, String> configOverride;
+
+  private String configFileName;
+  private SimPanel gui;
+  private boolean killSwitch;
+
   public Simulation() {
     simActivities = new LinkedList<ISimActivity>();
     agents = new HashMap<Integer, SimAgent>();
+    configOverride = new HashMap<String, String>();
   }
 
   public void setSimTimes(long simStartTime, long simEndTime, long simWarmupDuration) {
@@ -131,6 +145,23 @@ public class Simulation {
     return agents.size();
   }
 
+  public void setGui(SimPanel gui) {
+    this.gui = gui;
+  }
+
+  public SimPanel getGui() {
+    return this.gui;
+  }
+
+  public void setConfigOverride(Map<String, String> configOverride) {
+    this.configOverride = configOverride;
+  }
+
+  public void killSwitchOn(Map<String, String> overrideData) {
+    this.configOverride.putAll(overrideData);
+    this.killSwitch = true;
+  }
+
   public void updateAgentIndex(SimAgent agent, IVector newLocation) {
     IVector oldLocation = agent.getLocation();
     int oldSegmentId = oldLocation != null ? oldLocation.toRoadnetVector().getRoadSegment().getId() : -1;
@@ -187,8 +218,9 @@ public class Simulation {
       in.close();
 
       loadConfigurationFromSpecification(contents.toString());
+      this.configFileName = configFilename;
     } catch (IOException e) {
-      Logz.println("" + e);
+      Logz.println(e.toString());
       System.exit(-1);
     }
   }
@@ -203,10 +235,11 @@ public class Simulation {
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(configText)));
       Element rootNode = doc.getDocumentElement();
 
+      // TODO: pass config override object
       Collection<IXmlConfigInterpreter> interpreters = getConfigInterpreters();
       for (IXmlConfigInterpreter interpreter : interpreters) {
         Logz.println("Config interpreter: " + interpreter.getClass().getSimpleName());
-        interpreter.initFromXmlElement(rootNode, this);
+        interpreter.initFromXmlElement(rootNode, this, this.configOverride);
       }
 
     } catch (IOException e) {
@@ -258,10 +291,14 @@ public class Simulation {
 
     simTime = simStartTime;
 
+    killSwitch = false;
+
     for (ISimActivity activity : simActivities) {
       Logz.println("Scheduling activity: " + activity.getClass().getSimpleName());
       activity.scheduleOn(this);
     }
+
+    this.gui.setConfigFileName(this.configFileName);
   }
 
   /**
@@ -271,6 +308,31 @@ public class Simulation {
     for (ISimActivity activity : simActivities) {
       activity.cleanup();
     }
+
+    getStatistics();
+  }
+
+  private void getStatistics() {
+    JFrame frame = new JFrame("GT Mobile Agent Simulator (gt-mobisim)");
+
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+    Map<Integer, AtomicInteger> roadSegmentTravelledCountPerSpeedLimit = MetricsManager.getRoadSegmentTravelledCountPerSpeedLimit();
+
+    Iterator it = roadSegmentTravelledCountPerSpeedLimit.entrySet().iterator();
+    while (it.hasNext()) {
+      Map.Entry<Integer, AtomicInteger> pair = (Map.Entry)it.next();
+
+      JLabel speedCountLabel = new JLabel("Speed Limit: " + (int)Math.ceil(pair.getKey()*0.00223694) + "mph. Travel count (#): " + pair.getValue().get());
+      panel.add(speedCountLabel);
+    }
+    JLabel parkCountLabel = new JLabel("# of total parked: " + MetricsManager.getParkCount());
+    panel.add(parkCountLabel);
+
+    frame.add(panel);
+    frame.pack();
+    frame.setVisible(true);
   }
 
   /**
@@ -281,7 +343,7 @@ public class Simulation {
     Logz.println("Running simulation... ");
     long wallStartTime = System.nanoTime();
     long eventsProcessed = 0;
-    while ((simTime = eventQueue.getNextEventTime()) >= 0 && simTime < simEndTime) {
+    while (((simTime = eventQueue.getNextEventTime()) >= 0 && simTime < simEndTime) && !killSwitch) {
       eventQueue.executeNextEvent();
       eventsProcessed++;
 
@@ -297,6 +359,11 @@ public class Simulation {
 
     Varz.set("simRunTime", (simEndTime - simStartTime - simWarmupDuration) / 1000.0); // [sec], without warmup
     Varz.set("agentCount", agents.size());
+
+    if (killSwitch) {
+      SwingUtilities.getWindowAncestor(gui).dispose();
+      restartSimulation();
+    }
   }
 
   /**
@@ -337,6 +404,15 @@ public class Simulation {
 
     Simulation sim = new Simulation();
     sim.loadConfiguration(args[0]);
+    sim.initSimulation();
+    sim.runSimulation();
+    sim.endSimulation();
+  }
+
+  public void restartSimulation() {
+    Simulation sim = new Simulation();
+    sim.setConfigOverride(configOverride);
+    sim.loadConfiguration(this.configFileName);
     sim.initSimulation();
     sim.runSimulation();
     sim.endSimulation();

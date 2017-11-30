@@ -16,6 +16,8 @@ import edu.gatech.lbs.sim.tracegenerator.mobilitytrace.locationdistribution.ILoc
 import edu.gatech.lbs.sim.tracegenerator.mobilitytrace.locationdistribution.UniformLocationDistribution;
 import edu.gatech.lbs.sim.tracegenerator.mobilitytrace.locationdistribution.UniformRoadnetLocationDistribution;
 
+import java.util.Map;
+
 public class XmlLocationDistributionInterpreter implements IXmlConfigInterpreter {
   protected ILocationDistribution locationDistribution;
 
@@ -23,7 +25,7 @@ public class XmlLocationDistributionInterpreter implements IXmlConfigInterpreter
     return locationDistribution;
   }
 
-  public void initFromXmlElement(Element locationDistributionNode, Simulation sim) {
+  public void initFromXmlElement(Element locationDistributionNode, Simulation sim, Map<String, String> configOverride) {
     locationDistribution = null;
     if (locationDistributionNode == null) {
       return;

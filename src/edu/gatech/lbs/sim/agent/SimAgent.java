@@ -15,6 +15,10 @@ public class SimAgent implements IPhysicalAttributes {
   // Simulated physical attributes (eg. location) of the agent.
   protected SimPhysicalAttributes physicalAttributes;
 
+  // Simulated speed of the agent calculated by
+  // agent.getLocation().toRoadnetVector().toTangentVector().times(1e-6 * agent.getVelocity().getLength()).toCartesianVector().getLength() * MM_PER_SEC_TO_MPH;
+  private double mph;
+
   public SimAgent(Simulation sim, int simAgentId) {
     this.simAgentId = simAgentId;
     this.physicalAttributes = new SimPhysicalAttributes(sim);
@@ -46,5 +50,13 @@ public class SimAgent implements IPhysicalAttributes {
 
   public void simulateRemoveQuery(QueryKey simKey) {
     // do nothing
+  }
+
+  public double getMph() {
+    return mph;
+  }
+
+  public void setMph(double mph) {
+    this.mph = mph;
   }
 }

@@ -4,6 +4,7 @@
 //
 package edu.gatech.lbs.sim.tracegenerator.mobilitytrace.individual;
 
+import edu.gatech.lbs.core.logging.MetricsManager;
 import edu.gatech.lbs.core.vector.RoadnetVector;
 import edu.gatech.lbs.core.world.roadnet.RoadMap;
 import edu.gatech.lbs.core.world.roadnet.RoadSegment;
@@ -30,6 +31,8 @@ public class RoadnetRandomTrip_IndividualMobilityModel extends IndividualMobilit
   protected IParamDistribution speedDistribution;
   protected IParamDistribution parkingTimeDistribution;
   protected IParamDistribution stoppingTimeDistribution;
+
+  protected int count = 0;
 
   public RoadnetRandomTrip_IndividualMobilityModel(Simulation sim, SimAgent agent, ILocationDistribution locationDistribution, IParamDistribution speedDistribution, IParamDistribution parkingTimeDistribution, IParamDistribution stoppingTimeDistribution, long timestamp, RoadMap roadmap) {
     this.sim = sim;
@@ -59,6 +62,7 @@ public class RoadnetRandomTrip_IndividualMobilityModel extends IndividualMobilit
 
   protected void stopMoving() {
     v = new RoadnetVector(location.getRoadSegment(), 0);
+    MetricsManager.incrementPark();
   }
 
   protected void startMovingOnNewSegment() {
@@ -73,7 +77,10 @@ public class RoadnetRandomTrip_IndividualMobilityModel extends IndividualMobilit
       destination = route.getTarget();
     }
 
-    v = new RoadnetVector(location.getRoadSegment(), (destination.getProgress() > location.getProgress() ? +1 : -1) * (int) Math.abs(speedDistribution.getNextValue(location)));
+    RoadSegment roadSegment = location.getRoadSegment();
+    v = new RoadnetVector(roadSegment, (destination.getProgress() > location.getProgress() ? +1 : -1) * (int) Math.abs(speedDistribution.getNextValue(location)));
+
+    MetricsManager.addTravelledCountPerSpeedLimit(roadSegment.getSpeedLimit());
   }
 
   protected void planNewRoute() {

@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -49,7 +50,7 @@ public class XmlWorldConfigInterpreter implements IXmlConfigInterpreter {
     return roadmap;
   }
 
-  public void initFromXmlElement(Element rootNode, Simulation sim) throws IOException {
+  public void initFromXmlElement(Element rootNode, Simulation sim, Map<String, String> configOverride) throws IOException {
     Element worldNode = (Element) rootNode.getElementsByTagName("world").item(0);
 
     IWorld world = null;

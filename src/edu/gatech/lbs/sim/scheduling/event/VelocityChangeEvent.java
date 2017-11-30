@@ -28,8 +28,10 @@ public class VelocityChangeEvent extends SimEvent implements IMobilityChangeEven
   }
 
   public VelocityChangeEvent(Simulation sim, DataInputStream in) throws IOException {
+
     super(sim, in);
     int simAgentId = in.readInt();
+
     agent = sim.getAgent(simAgentId);
     location = IVectorFactory.load(in, sim.getWorld());
     velocity = IVectorFactory.load(in, sim.getWorld());

@@ -6,6 +6,7 @@ package edu.gatech.lbs.sim.tracegenerator.mobilitytrace.individual;
 
 import java.util.List;
 
+import edu.gatech.lbs.core.logging.MetricsManager;
 import edu.gatech.lbs.core.vector.RoadnetVector;
 import edu.gatech.lbs.core.world.roadnet.RoadJunction;
 import edu.gatech.lbs.core.world.roadnet.RoadSegment;
@@ -43,7 +44,9 @@ public class RoadnetRandomWaypoint_IndividualMobilityModel extends IndividualMob
   }
 
   protected void startMovingOnNewSegment() {
-    v = new RoadnetVector(location.getRoadSegment(), (destination.getProgress() > location.getProgress() ? +1 : -1) * (int) Math.abs(speedDistribution.getNextValue(location)));
+    RoadSegment roadSegment = location.getRoadSegment();
+    v = new RoadnetVector(roadSegment, (destination.getProgress() > location.getProgress() ? +1 : -1) * (int) Math.abs(speedDistribution.getNextValue(location)));
+    MetricsManager.addTravelledCountPerSpeedLimit(roadSegment.getSpeedLimit());
   }
 
   public SimEvent getNextEvent() {
