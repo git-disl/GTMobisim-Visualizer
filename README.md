@@ -1,4 +1,4 @@
-# GTMobisim
+# GTMobisim-Visualizer-SM
 
 
 Simulator for generating mobility traces and query traces for large numbers of mobile agents moving in a road network
