@@ -130,24 +130,24 @@ public class SimPanel extends JPanel {
         bounds = new BoundingBox(x0 + (long) (bounds.getWidth() * (1 - m) / 2), y0 + (long) (bounds.getHeight() * (1 - m) / 2), (long) (bounds.getWidth() * m), (long) (bounds.getHeight() * m));
       }
     });
-/*
-    this.addMouseListener(new MouseAdapter() {
 
-      public void mouseClicked(MouseEvent e) {
-        // JOptionPane.showMessageDialog(null, e.getLocationOnScreen().x + " px, " + e.getLocationOnScreen().y + " px\n" + loc + "\n" + loc.toRoadnetVector((RoadMap) sim.getWorld()));
-
-        double m = 1;
-        switch (e.getButton()) {
-        case MouseEvent.BUTTON1:
-          m /= zoomRate;
-          break;
-        case MouseEvent.BUTTON3:
-          m *= zoomRate;
-          break;
-        }
-        zoom(getLocation(bounds, new Point(e.getX(), e.getY())), m);
-      }
-    });
+//    this.addMouseListener(new MouseAdapter() {
+//
+//      public void mouseClicked(MouseEvent e) {
+//        // JOptionPane.showMessageDialog(null, e.getLocationOnScreen().x + " px, " + e.getLocationOnScreen().y + " px\n" + loc + "\n" + loc.toRoadnetVector((RoadMap) sim.getWorld()));
+//
+//        double m = 1;
+//        switch (e.getButton()) {
+//        case MouseEvent.BUTTON1:
+//          m /= zoomRate;
+//          break;
+//        case MouseEvent.BUTTON3:
+//          m *= zoomRate;
+//          break;
+//        }
+//        zoom(getLocation(bounds, new Point(e.getX(), e.getY())), m);
+//      }
+//    });
 
     this.addMouseWheelListener(new MouseAdapter() {
       public void mouseWheelMoved(MouseWheelEvent e) {
@@ -155,7 +155,7 @@ public class SimPanel extends JPanel {
         zoom(getLocation(bounds, new Point(e.getX(), e.getY())), m);
       }
     });
-*/
+
     this.addComponentListener(new ComponentAdapter() {
       // This method is called after the component's size changes
       public void componentResized(ComponentEvent evt) {
@@ -263,21 +263,21 @@ public class SimPanel extends JPanel {
     configPanel.add(new JLabel("  length per segment: avg= " + String.format("%.1f", lengthAvg) + " m (" + String.format("%.1f", travelTimeAvg) + " sec), min= " + String.format("%.1f", lengthMin) + " m, max= " + String.format("%.1f", lengthMax) + " m"));
     configPanel.add(new JLabel("  points per segment: avg= " + String.format("%.1f", pointsAvg) + ", min= " + pointsMin + ", max= " + pointsMax + " " + "\n"));
     configPanel.add(new JLabel("    "));
-    configPanel.add(new JLabel("Color Legend (Car Status): \n"));
+    configPanel.add(new JLabel("<html> Color Legend (Car Status): <br></html>"));
 
-    JLabel parkedLabel = new JLabel("parked (Black) \n");
-    parkedLabel.setForeground(Color.BLACK);
-    JLabel under10Label = new JLabel("< 10 mph\n");
-    under10Label.setForeground(Color.BLUE);
-    JLabel under20Label = new JLabel("< 20 mph\n");
-    under20Label.setForeground(Color.CYAN);
-    JLabel under30Label = new JLabel("< 30 mph\n");
-    under30Label.setForeground(Color.GREEN);
-    JLabel under40Label = new JLabel("< 40 mph\n");
-    under40Label.setForeground(Color.YELLOW);
-    JLabel under50Label = new JLabel("< 50 mph\n");
+    JLabel parkedLabel = new JLabel("0 mph parked (Black) \n");
+    parkedLabel.setForeground(Color.DARK_GRAY);
+    JLabel under10Label = new JLabel("[1 - 9] mph\n");
+    under10Label.setForeground(Color.decode("#561a56")); // purple
+    JLabel under20Label = new JLabel("[10 - 19] mph\n");
+    under20Label.setForeground(Color.BLUE);
+    JLabel under30Label = new JLabel("[20 - 29] mph\n");
+    under30Label.setForeground(Color.decode("#55DDE0")); // skyblue
+    JLabel under40Label = new JLabel("[30 - 39] mph\n");
+    under40Label.setForeground(Color.decode("#26C485")); // green
+    JLabel under50Label = new JLabel("[40 - 49] mph\n");
     under50Label.setForeground(Color.ORANGE);
-    JLabel under60Label = new JLabel("< 60 mph\n");
+    JLabel under60Label = new JLabel("[59 - 59] mph\n");
     under60Label.setForeground(Color.MAGENTA);
     JLabel elseLabel = new JLabel("> 60 mph\n");
     elseLabel.setForeground(Color.RED);
@@ -291,8 +291,7 @@ public class SimPanel extends JPanel {
     configPanel.add(under60Label);
     configPanel.add(elseLabel);
 
-    configPanel.add(new JLabel("    "));
-    JLabel graphNameLabel = new JLabel("Speed Proportion");
+    JLabel graphNameLabel = new JLabel("<html> <br> Proportion of Agent Speed Distribution </html>");
     configPanel.add(graphNameLabel);
 
     return configPanel;

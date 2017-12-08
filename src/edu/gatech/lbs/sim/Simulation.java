@@ -11,6 +11,7 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -18,6 +19,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import edu.gatech.lbs.core.logging.MetricsManager;
+import edu.gatech.lbs.core.world.roadnet.RoadMap;
 import edu.gatech.lbs.sim.gui.SimPanel;
 import edu.gatech.lbs.sim.scheduling.activity.GuiDrawingActivity;
 import org.w3c.dom.Document;
@@ -173,6 +175,7 @@ public class Simulation {
 
     if (oldSegmentId >= 0) {
       agentIndex.get(oldSegmentId).remove(agent);
+      MetricsManager.updateAverageSpeedForRoadSegment(oldSegmentId, agent.getMph());
     }
     if (newSegmentId >= 0) {
       List<SimAgent> agentsOnSegment = agentIndex.get(newSegmentId);
@@ -181,6 +184,8 @@ public class Simulation {
         agentIndex.put(newSegmentId, agentsOnSegment);
       }
       agentsOnSegment.add(agent);
+
+      // output statistics
     }
   }
 
@@ -333,6 +338,35 @@ public class Simulation {
     frame.add(panel);
     frame.pack();
     frame.setVisible(true);
+
+    Map<Integer, AtomicLong> roadSegmentAverageSpeed = MetricsManager.getRoadSegmentAverageSpeed();
+    it = roadSegmentAverageSpeed.entrySet().iterator();
+
+    final JFrame speedWindow = new JFrame();
+    final JTextArea speedText = new JTextArea(40,20);
+    JScrollPane scroll = new JScrollPane(speedText);
+
+    StringBuilder speedBuilder = new StringBuilder();
+    speedBuilder.append("road segment id, speed limit, average mph\n");
+    while (it.hasNext()) {
+      Map.Entry<Integer, AtomicLong> pair = (Map.Entry)it.next();
+
+      speedBuilder.append(pair.getKey());
+      speedBuilder.append(", ");
+      speedBuilder.append(Math.ceil(((RoadMap)world).getRoadSegment(pair.getKey()).getSpeedLimit() * 0.00223694));
+      speedBuilder.append(", ");
+      speedBuilder.append(Double.longBitsToDouble(pair.getValue().get()));
+      speedBuilder.append("\n");
+    }
+
+    speedText.setText(speedBuilder.toString());
+    JPanel configPanel = new JPanel();
+    configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
+    configPanel.add(scroll);
+
+    speedWindow.add(scroll);
+    speedWindow.pack();
+    speedWindow.setVisible(true);
   }
 
   /**

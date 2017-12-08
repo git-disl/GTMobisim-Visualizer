@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by SOM2 on 11/16/17.
@@ -19,9 +20,35 @@ public class MetricsManager {
     private static Map<Integer, AtomicInteger> roadSegmentTravelledCountPerSpeedLimit;  // Key: SpeedLimit of the Road Segment, Value:
     private static AtomicInteger parkCount = new AtomicInteger(0);
     private static TreeMap<Integer, Set<SimAgent>> speedRangeToAgentMap;
+    private static Map<Integer, AtomicLong> roadSegmentAverageSpeed;
+    private static Map<Integer, AtomicInteger> roadSegmentTotalAgentCount;
+
+    public synchronized static void updateAverageSpeedForRoadSegment(int roadSegmentId, double mph) {
+        if (roadSegmentAverageSpeed == null) {
+            roadSegmentAverageSpeed = new ConcurrentHashMap<>();
+            roadSegmentTotalAgentCount = new ConcurrentHashMap<>();
+        }
+
+        if (roadSegmentAverageSpeed.containsKey(roadSegmentId)) {
+            long avgMphLongBits = roadSegmentAverageSpeed.get(roadSegmentId).getAndUpdate((longBits) -> {
+                roadSegmentTotalAgentCount.get(roadSegmentId).getAndIncrement();
+
+                double newAvg = (mph + Double.longBitsToDouble(longBits))/(double)roadSegmentTotalAgentCount.get(roadSegmentId).get();
+
+                return Double.doubleToLongBits(newAvg);
+            });
+        } else {
+            roadSegmentAverageSpeed.put(roadSegmentId, new AtomicLong(Double.doubleToLongBits(mph)));
+            roadSegmentTotalAgentCount.put(roadSegmentId, new AtomicInteger(1));
+        }
+    }
+
+    public static Map<Integer, AtomicLong> getRoadSegmentAverageSpeed() {
+        return roadSegmentAverageSpeed;
+    }
 
     //multiple thread and needs to be syncrhonized (AtomicInteger syncrhonized)
-    public static void addTravelledCountPerSpeedLimit(Integer speedLimit) { //Road segment speed limit
+    public synchronized static void addTravelledCountPerSpeedLimit(Integer speedLimit) { //Road segment speed limit
         if (roadSegmentTravelledCountPerSpeedLimit == null) {
             roadSegmentTravelledCountPerSpeedLimit = new ConcurrentHashMap<>();
         }
@@ -43,7 +70,7 @@ public class MetricsManager {
         return roadSegmentTravelledCountPerSpeedLimit;
     }
 
-    public static void addAgentToSpeed(SimAgent agent, double oldMph, double newMph) {
+    public synchronized static void addAgentToSpeed(SimAgent agent, double oldMph, double newMph) {
         if (speedRangeToAgentMap == null) {
             initSpeedRangeToAgentMap();
         } else {

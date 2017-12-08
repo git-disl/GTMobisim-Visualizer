@@ -8,7 +8,7 @@
   </file>
   </world>
 
-  <agents count="1000">
+  <agents count="100">
     <mobilitymodel type="RandomTripRoadnet" filename="traces/web-demo.m.trace" overwrite="yes">
       <parking type="gaussian" mean="10 sec" stdev="5 sec"/>
 			

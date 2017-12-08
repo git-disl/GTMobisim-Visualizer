@@ -71,13 +71,13 @@ public class AgentsDrawer implements IDrawer {
     if (mph == 0) {
       return Color.DARK_GRAY;
     } else if (mph < 10) {
-      return Color.BLUE;
+      return Color.decode("#561a56");
     } else if (mph < 20) {
-      return Color.CYAN;
+      return Color.BLUE;
     } else if (mph < 30) {
-      return Color.GREEN;
+      return Color.decode("#55DDE0"); // SKY Blue
     } else if (mph < 40) {
-      return Color.YELLOW;
+      return Color.decode("#26C485"); // GREEN
     } else if (mph < 50) {
       return Color.ORANGE;
     } else if (mph < 60) {
