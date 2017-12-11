@@ -4,7 +4,7 @@
 Simulator for generating mobility traces and query traces for large numbers of mobile agents moving in a road network
 
 ### Screenshots
-![Alt text](screenshot/video.gif)
+![Alt text](resource/video.gif)
 ### Prerequisites
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * [IntelliJ](https://www.jetbrains.com/idea/) - or - [Eclipse](http://www.eclipse.org/downloads/eclipse-packages/)
@@ -14,11 +14,11 @@ Simulator for generating mobility traces and query traces for large numbers of m
 * [gt-mobisim](https://code.google.com/archive/p/gt-mobisim/)
 
 ### Documentation
-* [gt-mobisim-visualization-sm](https://docs.google.com/presentation/d/1DR9LVk_yvhNLQrlwvTPKg2P7smQg0t6qZj74NQhZiSw/edit?usp=sharing)
+* [gt-mobisim-visualization-sm](resource/CS6999GT-MobisimVisualization-SoMiChoi.pptx)
 ### Run configuration using IntelliJ
 1. In run tab, select edit configuration
 2. Example Run configuration 
-![Alt text](screenshot/run_configuration.png)
+![Alt text](resource/run_configuration.png)
 
 ### Example for adding statistics
 
