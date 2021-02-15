@@ -1,5 +1,6 @@
 # GTMobisim-Visualizer-SM
 
+This is a mirror of https://github.gatech.edu/schoi388/GTMobisim-Visualizer-SM
 
 Simulator for generating mobility traces and query traces for large numbers of mobile agents moving in a road network
 
